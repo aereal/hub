@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/github/hub/Godeps/_workspace/src/github.com/octokit/go-octokit/octokit"
+	"github.com/github/hub/git"
 )
 
 const (
@@ -571,7 +572,8 @@ func (client *Client) newOctokitClient(auth octokit.AuthMethod) *octokit.Client 
 	host = normalizeHost(host)
 	apiHostURL := client.absolute(host)
 
-	httpClient := newHttpClient(os.Getenv("HUB_TEST_HOST"), os.Getenv("HUB_VERBOSE") != "")
+	skipVerify, _ := git.Config("hub.sslVerify")
+	httpClient := newHttpClient(os.Getenv("HUB_TEST_HOST"), os.Getenv("HUB_VERBOSE") != "", skipVerify == "true")
 	c := octokit.NewClientWith(apiHostURL.String(), UserAgent, auth, httpClient)
 
 	return c

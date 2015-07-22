@@ -2,6 +2,7 @@ package github
 
 import (
 	"bytes"
+	"crypto/tls"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -119,7 +120,7 @@ func (t *verboseTransport) verbosePrintln(msg string) {
 	fmt.Fprintln(t.Out, msg)
 }
 
-func newHttpClient(testHost string, verbose bool) *http.Client {
+func newHttpClient(testHost string, verbose bool, skipVerify bool) *http.Client {
 	var testURL *url.URL
 	if testHost != "" {
 		testURL, _ = url.Parse(testHost)
@@ -132,6 +133,7 @@ func newHttpClient(testHost string, verbose bool) *http.Client {
 				KeepAlive: 30 * time.Second,
 			}).Dial,
 			TLSHandshakeTimeout: 10 * time.Second,
+			TLSClientConfig:     &tls.Config{InsecureSkipVerify: skipVerify},
 		},
 		Verbose:     verbose,
 		OverrideURL: testURL,
